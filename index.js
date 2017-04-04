@@ -10,7 +10,7 @@ http.createServer(function (req, res) {
     var body = parsed.payload;
 
     res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end();
+    res.end("we are cool!");
 
     var logData = [
       '> Log time: ' + logTime() + '',
