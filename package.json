@@ -4,8 +4,7 @@
   "description": "An extremely simple callback server",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/forever start index.js",
-    "stop": "./node_modules/.bin/forever stop index.js"
+    "start": "node index.js",
   },
   "repository": {
     "type": "git",
