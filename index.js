@@ -10,7 +10,7 @@ app.get('/', function (req, res) {
     res.send('Hello Farshad!');
   });*/
   console.log(__dirname);
-  res.send('Hello Farshad!');
+  res.status(200).send('Hello Farshad!');
   
 })
 
