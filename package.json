@@ -1,28 +1,15 @@
 {
   "name": "callback-server",
-  "version": "1.1.0",
-  "description": "An extremely simple callback server",
-  "main": "index.js",
+  "version": "1.0.0",
+  "description": "This is a simple nodejs application",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/SpoonX/callback-server.git"
-  },
-  "keywords": [
-    "callback",
-    "server",
-    "log"
-  ],
-  "author": "RWOverdijk <wesley@spoonx.nl>",
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/SpoonX/callback-server/issues"
-  },
-  "homepage": "https://github.com/SpoonX/callback-server#readme",
   "dependencies": {
-    "forever": "^0.15.1",
-    "subtext": "^2.0.1"
+    "express": "^4.14.1"
   }
 }
