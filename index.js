@@ -1,11 +1,14 @@
-var express = require('express')
-var app = express()
+var express = require('express');
+var app = express();
+var bodyParser = require("body-parser");
+
+app.use(bodyParser.json());
 
 app.use(function(req, res, next){
   console.log('method: ' + req.method);
-  console.log('query: ' + req.query);
-  console.log('params: ' + req.params);
-  console.log('body: ' + req.body);
+  console.log('query: ' + JSON.stringify(req.query));
+  console.log('params: ' + JSON.stringify(req.params));
+  console.log('body: ' + JSON.stringify(req.body));
   next();
 });
 
