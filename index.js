@@ -1,10 +1,15 @@
 var express = require('express')
 var app = express()
 
+app.use(function(req, res, next){
+  console.log('method: ' + req.method);
+  console.log('query: ' + req.query);
+  console.log('params: ' + req.params);
+  console.log('body: ' + req.body);
+  next();
+});
+
 app.get('/', function (req, res) {
-  console.log("Received");
-  console.log(req);
-  console.log(req.body);
   res.status(200).send();
 })
 
