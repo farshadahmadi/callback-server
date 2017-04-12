@@ -4,6 +4,8 @@ var bodyParser = require("body-parser");
 
 app.use(bodyParser.json());
 
+var routingTable = {};
+
 /*app.use(function(req, res, next){
   console.log('method: ' + req.method);
   console.log('query: ' + JSON.stringify(req.query));
@@ -13,11 +15,17 @@ app.use(bodyParser.json());
 });*/
 
 app.get('/', function (req, res) {
-  res.status(200).send();
+  res.status(200).send(JSON.stringify(routingTable));
 });
 
 app.post('/', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
+  res.status(200).send();
+});
+
+app.post('/register', function (req, res) {
+  console.log('body: ' + JSON.stringify(req.body));
+  routingTable[req.body.requestId] = req.body.url;
   res.status(200).send();
 });
 
