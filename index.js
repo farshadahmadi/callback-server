@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var bodyParser = require("body-parser");
+var request = require('request');
 
 app.use(bodyParser.json());
 
@@ -20,6 +21,9 @@ app.get('/', function (req, res) {
 
 app.post('/', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
+  var requestId = req.body.requestId;
+  cosole.log(requireId);
+  req.pipe(request.post(routingTable[req.body.requestId]));
   res.status(200).send();
 });
 
