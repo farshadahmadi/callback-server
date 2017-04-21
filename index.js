@@ -21,9 +21,9 @@ app.get('/', function (req, res) {
 
 app.post('/', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
-  var requestId = req.body.requestId;
+  var requestId = req.body.responses[0].requestId;
   console.log(requestId);
-  req.pipe(request.post({uri: routingTable[req.body.requestId]}));
+  req.pipe(request.post({uri: routingTable[requestId}));
   res.status(200).send();
 });
 
