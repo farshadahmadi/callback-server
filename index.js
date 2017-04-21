@@ -23,7 +23,7 @@ app.post('/', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
   var requestId = req.body.responses[0].requestId;
   console.log(requestId);
-  req.pipe(request.post({uri: routingTable[requestId], timeout: 3000})).pipe(res);
+  req.pipe(request.post({url: routingTable[requestId], timeout: 5000})).pipe(res);
   //res.status(200).send();
 });
 
