@@ -24,14 +24,20 @@ app.post('/', function (req, res) {
   var requestId = req.body.responses[0].requestId;
   console.log(requestId);
   console.log(routingTable[requestId]);
-  req.pipe(request.post(routingTable[requestId]))
-  .on('error',function(error){
+  req.pipe(request.post({
+    uri: routingTable[requestId],
+    headers:{'content-type':'application/json'}
+  ))
+  .on('error', function(error){
     console.log(error.toString())
+    res.status(200).send();
+  })
+  .on('response', function(result){
     res.status(200).send();
   })
   //.pipe(res);
   //req.pipe(request.post({url: routingTable[requestId], timeout: 15000}));//.pipe(res);
-  res.status(200).send();
+  //res.status(200).send();
 });
 
 app.post('/register', function (req, res) {
