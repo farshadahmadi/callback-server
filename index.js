@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var bodyParser = require("body-parser");
-var request = require('request');
+var request = require('request-promise');
 
 app.use(bodyParser.json());
 
@@ -24,7 +24,22 @@ app.post('/', function (req, res) {
   var requestId = req.body.responses[0].requestId;
   console.log(requestId);
   console.log(routingTable[requestId]);
-  req.pipe(request.post({
+
+  request({
+    url: routingTable[requestId],
+    headers: {'content-type':'application/json'},
+    method: 'POST',
+    json: true,
+    body: req.body
+  }).then(function(result){
+    console.log(result);
+    res.status(200).send();
+  }).catch(function(err){
+    console.log(err);
+    res.status(200).send();
+  });
+
+  /*req.pipe(request.post({
     uri: routingTable[requestId],
     headers:{'content-type':'application/json'}
   }))
@@ -34,7 +49,7 @@ app.post('/', function (req, res) {
   })
   .on('response', function(result){
     res.status(200).send();
-  })
+  })*/
   //.pipe(res);
   //req.pipe(request.post({url: routingTable[requestId], timeout: 15000}));//.pipe(res);
   //res.status(200).send();
