@@ -27,7 +27,7 @@ app.post('/', function (req, res) {
   req.pipe(request.post({
     uri: routingTable[requestId],
     headers:{'content-type':'application/json'}
-  ))
+  }))
   .on('error', function(error){
     console.log(error.toString())
     res.status(200).send();
