@@ -19,7 +19,7 @@ var routingTable = {};
 
 function sendDataToApp(item){
   return request({
-    url: routingTable[item.requestId],
+    url: routingTable[item.id],
     headers: {'content-type':'application/json'},
     method: 'POST',
     json: true,
@@ -30,7 +30,7 @@ function sendDataToApp(item){
 
 function processQueue(){
   var item = queue.shift();
-  if(routingTable[item.requestId]){
+  if(routingTable[item.id]){
     sendDataToApp(item)
       .then(function(result){
         console.log(result);
