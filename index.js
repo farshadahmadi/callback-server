@@ -5,6 +5,8 @@ var request = require('request-promise');
 
 app.use(bodyParser.json());
 
+var queue = [];
+
 var routingTable = {};
 
 /*app.use(function(req, res, next){
@@ -15,29 +17,57 @@ var routingTable = {};
   next();
 });*/
 
+function sendDataToApp(item){
+  return request({
+    url: routingTable[item.requestId],
+    headers: {'content-type':'application/json'},
+    method: 'POST',
+    json: true,
+    body: item.data,
+    timeout: 5000
+  });
+}
+
+function processQueue(){
+  var item = queue.shift();
+  if(routingTable[item.requestId]){
+    sendDataToApp(item)
+      .then(function(result){
+        console.log(result);
+      }).catch(function(err){
+        console.log(err);
+      });
+  } else {
+    queue.push(item);
+  }
+}
+
 app.get('/', function (req, res) {
   res.status(200).send(JSON.stringify(routingTable));
 });
 
+// IMPACT sends data to this API
 app.post('/', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
+  // get the requestId to find the target the application to which the data should be routed.
   var requestId = req.body.responses[0].requestId;
   console.log(requestId);
   console.log(routingTable[requestId]);
+  var item = {id: requestId, data: req.body};
 
-  request({
-    url: routingTable[requestId],
-    headers: {'content-type':'application/json'},
-    method: 'POST',
-    json: true,
-    body: req.body
-  }).then(function(result){
-    console.log(result);
+  if (routingTable[requestId]) {
+    sendDataToApp(item)
+      .then(function(result){
+        console.log(result);
+        res.status(200).send();
+      }).catch(function(err){
+        console.log(err);
+        res.status(200).send();
+      });
+  } else {
+    queue.push({ id: requestId, data: req.body});
     res.status(200).send();
-  }).catch(function(err){
-    console.log(err);
-    res.status(200).send();
-  });
+  }
 
   /*req.pipe(request.post({
     uri: routingTable[requestId],
