@@ -5,8 +5,11 @@ var request = require('request-promise');
 
 app.use(bodyParser.json());
 
+// if app info is not yet registered (saved to routingTable), it will be queued
 var queue = [];
 
+// map requestIds (sent by IMPACT) to the URL of IOT apps, e.g.
+// {"requestId":"003ccb2f-74ae-43c5-87b5-31541a209f2a","url":"http://130.230.142.100:8080/app/250330/api"}
 var routingTable = {};
 
 /*app.use(function(req, res, next){
@@ -17,6 +20,7 @@ var routingTable = {};
   next();
 });*/
 
+// send data to the IoT app
 function sendDataToApp(item){
   return request({
     url: routingTable[item.id],
@@ -28,10 +32,14 @@ function sendDataToApp(item){
   });
 }
 
+// pop an item from queue
 function processQueue(){
+  // pop app info from the queue
   var item = queue.shift();
   if (item) {
+    // if app info is already registered
     if(routingTable[item.id]){
+      // send the data to the app
       sendDataToApp(item)
         .then(function(result){
           console.log(result);
@@ -40,12 +48,14 @@ function processQueue(){
           console.log(err);
           delete routingTable[item.id];
         });
+    // otherwise, queue the app info again
     } else {
       queue.push(item);
     }
   }
 }
 
+// pops items from queue every 1 second
 setInterval(processQueue, 1000);
 
 app.get('/', function (req, res) {
@@ -53,7 +63,7 @@ app.get('/', function (req, res) {
   res.status(200).send(JSON.stringify(routingTable));
 });
 
-// IMPACT sends data to this API
+// IMPACT platform sends data to this API
 app.post('/', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
   // get the requestId to find the target the application to which the data should be routed.
@@ -62,7 +72,9 @@ app.post('/', function (req, res) {
   console.log(routingTable[requestId]);
   var item = {id: requestId, data: req.body};
 
+  // if app info is already registered
   if (routingTable[requestId]) {
+    // send the data to the app
     sendDataToApp(item)
       .then(function(result){
         console.log(result);
@@ -73,27 +85,16 @@ app.post('/', function (req, res) {
         delete routingTable[item.id];
         res.status(200).send();
       });
+  // otherwise, queue the app info
   } else {
     queue.push({ id: requestId, data: req.body});
     res.status(200).send();
   }
-
-  /*req.pipe(request.post({
-    uri: routingTable[requestId],
-    headers:{'content-type':'application/json'}
-  }))
-  .on('error', function(error){
-    console.log(error.toString())
-    res.status(200).send();
-  })
-  .on('response', function(result){
-    res.status(200).send();
-  })*/
-  //.pipe(res);
-  //req.pipe(request.post({url: routingTable[requestId], timeout: 15000}));//.pipe(res);
-  //res.status(200).send();
 });
 
+// IoT apps registers their info via this aPI.
+// App info contains the requestId (that app got from IMPACT platfom immediately after requesting data) and the app URL. e.g.,
+// {"requestId":"003ccb2f-74ae-43c5-87b5-31541a209f2a","url":"http://130.230.142.100:8080/app/250330/api"}
 app.post('/register', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
   routingTable[req.body.requestId] = req.body.url;
