@@ -46,9 +46,10 @@ function processQueue(){
   }
 }
 
-setTimeout(processQueue, 1000);
+setInterval(processQueue, 1000);
 
 app.get('/', function (req, res) {
+  console.log(JSON.stringify(queue));
   res.status(200).send(JSON.stringify(routingTable));
 });
 
