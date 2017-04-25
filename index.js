@@ -30,17 +30,21 @@ function sendDataToApp(item){
 
 function processQueue(){
   var item = queue.shift();
-  if(routingTable[item.id]){
-    sendDataToApp(item)
-      .then(function(result){
-        console.log(result);
-      }).catch(function(err){
-        console.log(err);
-      });
-  } else {
-    queue.push(item);
+  if (item) {
+    if(routingTable[item.id]){
+      sendDataToApp(item)
+        .then(function(result){
+          console.log(result);
+        }).catch(function(err){
+          console.log(err);
+        });
+    } else {
+      queue.push(item);
+    }
   }
 }
+
+setTimeout(processQueue, 1000);
 
 app.get('/', function (req, res) {
   res.status(200).send(JSON.stringify(routingTable));
