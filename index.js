@@ -35,8 +35,10 @@ function processQueue(){
       sendDataToApp(item)
         .then(function(result){
           console.log(result);
+          delete routingTable[item.id];
         }).catch(function(err){
           console.log(err);
+          delete routingTable[item.id];
         });
     } else {
       queue.push(item);
@@ -63,9 +65,11 @@ app.post('/', function (req, res) {
     sendDataToApp(item)
       .then(function(result){
         console.log(result);
+        delete routingTable[item.id];
         res.status(200).send();
       }).catch(function(err){
         console.log(err);
+        delete routingTable[item.id];
         res.status(200).send();
       });
   } else {
