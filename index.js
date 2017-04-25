@@ -36,7 +36,8 @@ function sendDataToApp(item){
 function processQueue(){
   // pop app info from the queue
   var item = queue.shift();
-  if (item) {
+  // if queue is not empty and the popped item has already not tried all of its 10 attempts
+  if (item && item.attempts) {
     // if app info is already registered
     if(routingTable[item.id]){
       // send the data to the app
@@ -50,6 +51,8 @@ function processQueue(){
         });
     // otherwise, queue the app info again
     } else {
+      console.log(item.attempts);
+      item.attempts--;
       queue.push(item);
     }
   }
@@ -87,7 +90,7 @@ app.post('/', function (req, res) {
       });
   // otherwise, queue the app info
   } else {
-    queue.push({ id: requestId, data: req.body});
+    queue.push({ id: requestId, data: req.body, attempts: 10});
     res.status(200).send();
   }
 });
