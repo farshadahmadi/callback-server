@@ -44,10 +44,14 @@ function processQueue(){
       sendDataToApp(item)
         .then(function(result){
           console.log(result);
-          delete routingTable[item.id];
+          if(item.mode == "once") {
+            delete routingTable[item.id];
+          }
         }).catch(function(err){
           console.log(err);
-          delete routingTable[item.id];
+          if(item.mode == "once") {
+            delete routingTable[item.id];
+          }
         });
     // otherwise, queue the app info again
     } else {
@@ -71,26 +75,36 @@ app.post('/', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
   // get the requestId to find the target the application to which the data should be routed.
   var requestId = req.body.responses[0].requestId;
-  console.log(requestId);
-  console.log(routingTable[requestId]);
-  var item = {id: requestId, data: req.body};
+  var subscriptionId = null;
+  //console.log(requestId);
+  //console.log(routingTable[requestId]);
+  var item = {id: requestId || subscriptionId, data: req.body, mode: requestId ? "once" : "subscription"};
+  console.log(item.id);
+  console.log(item.mode);
+  console.log(routingTable[item.id]);
 
   // if app info is already registered
-  if (routingTable[requestId]) {
+  if (routingTable[item.id]) {
     // send the data to the app
     sendDataToApp(item)
       .then(function(result){
         console.log(result);
-        delete routingTable[item.id];
+        if(item.mode == "once") {
+          delete routingTable[item.id];
+        }
         res.status(200).send();
       }).catch(function(err){
         console.log(err);
-        delete routingTable[item.id];
+        if(item.mode == "once") {
+          delete routingTable[item.id];
+        }
         res.status(200).send();
       });
   // otherwise, queue the app info
   } else {
-    queue.push({ id: requestId, data: req.body, attempts: 10});
+    item.attempts = 10;
+    //queue.push({ id: requestId, data: req.body, attempts: 10});
+    queue.push(item);
     res.status(200).send();
   }
 });
@@ -100,7 +114,8 @@ app.post('/', function (req, res) {
 // {"requestId":"003ccb2f-74ae-43c5-87b5-31541a209f2a","url":"http://130.230.142.100:8080/app/250330/api"}
 app.post('/register', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
-  routingTable[req.body.requestId] = req.body.url;
+  //routingTable[req.body.requestId] = req.body.url;
+  routingTable[req.body.id] = req.body.url;
   res.status(200).send();
 });
 
