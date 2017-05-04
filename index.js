@@ -74,8 +74,8 @@ app.get('/', function (req, res) {
 app.post('/', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
   // get the requestId to find the target the application to which the data should be routed.
-  var requestId = req.body.responses[0].requestId;
-  var subscriptionId = null;
+  var requestId = req.body.responses[0] ? req.body.responses[0].requestId || null;
+  var subscriptionId = req.body.updates[0] ? req.body.updates[0].subscriptionId || null;
   //console.log(requestId);
   //console.log(routingTable[requestId]);
   var item = {id: requestId || subscriptionId, data: req.body, mode: requestId ? "once" : "subscription"};
