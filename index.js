@@ -73,41 +73,69 @@ app.get('/', function (req, res) {
 // IMPACT platform sends data to this API
 app.post('/', function (req, res) {
   console.log('body: ' + JSON.stringify(req.body));
+
+  sendAll(req.body)
+    .then(function(result){
+      console.log(result);
+      res.status(200).send();
+    });
   // get the requestId to find the target the application to which the data should be routed.
-  var requestId = req.body.responses[0] ? req.body.responses[0].requestId : null;
+  /*var requestId = req.body.responses[0] ? req.body.responses[0].requestId : null;
   var subscriptionId = req.body.updates[0] ? req.body.updates[0].subscriptionId : null;
-  //console.log(requestId);
-  //console.log(routingTable[requestId]);
   var item = {id: requestId || subscriptionId, data: req.body, mode: requestId ? "once" : "subscription"};
   console.log(item.id);
   console.log(item.mode);
   console.log(routingTable[item.id]);
 
+  send(item).then(function(code){
+    res.status(code).send();
+  });*/
+
+});
+
+function sendAll(body){
+  var items = body.responses.map(function(res){
+    var data = {reports:[], registrations:[], deregistrations:[], updates:[], expirations:[], responses:[res]};
+    var item = {id: res.requestId, data: data , mode: "once"};
+    console.log(item.id);
+    console.log(item.mode);
+    console.log(routingTable[item.id]);
+    return item;
+    //return {id: res.requestId, data: data , mode: "once"};
+  });
+
+  return Promise.all(items.map(send));
+}
+
+function send(item){
   // if app info is already registered
   if (routingTable[item.id]) {
     // send the data to the app
-    sendDataToApp(item)
+    return sendDataToApp(item)
       .then(function(result){
         console.log(result);
         if(item.mode == "once") {
           delete routingTable[item.id];
         }
-        res.status(200).send();
+        return 200;
+        //res.status(200).send();
       }).catch(function(err){
         console.log(err);
         if(item.mode == "once") {
           delete routingTable[item.id];
         }
-        res.status(200).send();
+        return 200;
+        //res.status(200).send();
       });
   // otherwise, queue the app info
   } else {
     item.attempts = 10;
     //queue.push({ id: requestId, data: req.body, attempts: 10});
     queue.push(item);
-    res.status(200).send();
+    return 200;
+    //res.status(200).send();
   }
-});
+}
 
 // IoT apps registers their info via this aPI.
 // App info contains the requestId (that app got from IMPACT platfom immediately after requesting data) and the app URL. e.g.,
