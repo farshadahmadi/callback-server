@@ -98,6 +98,7 @@ function sendAll(body){
     var data = {reports:[], registrations:[], deregistrations:[], updates:[], expirations:[], responses:[res]};
     var item = {id: res.requestId, data: data , mode: "once"};
     console.log(item.id);
+    console.log(item.data);
     console.log(item.mode);
     console.log(routingTable[item.id]);
     return item;
