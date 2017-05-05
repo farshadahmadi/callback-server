@@ -108,7 +108,7 @@ function sendAll(body){
 
   items.push.apply(items, body.updates.map(function(update){
     var data = {reports:[], registrations:[], deregistrations:[], updates:[update], expirations:[], responses:[]};
-    var item = {id: res.subscriptionId, data: data , mode: "subscription"};
+    var item = {id: update.subscriptionId, data: data , mode: "subscription"};
     console.log(item.id);
     console.log(item.data);
     console.log(item.mode);
