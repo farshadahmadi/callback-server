@@ -94,6 +94,7 @@ app.post('/', function (req, res) {
 });
 
 function sendAll(body){
+  
   var items = body.responses.map(function(res){
     var data = {reports:[], registrations:[], deregistrations:[], updates:[], expirations:[], responses:[res]};
     var item = {id: res.requestId, data: data , mode: "once"};
@@ -104,6 +105,17 @@ function sendAll(body){
     return item;
     //return {id: res.requestId, data: data , mode: "once"};
   });
+
+  items.push.apply(items, body.updates.map(function(update){
+    var data = {reports:[], registrations:[], deregistrations:[], updates:[update], expirations:[], responses:[]};
+    var item = {id: res.requestId, data: data , mode: "once"};
+    console.log(item.id);
+    console.log(item.data);
+    console.log(item.mode);
+    console.log(routingTable[item.id]);
+    return item;
+    //return {id: res.requestId, data: data , mode: "once"};
+  }));
 
   return Promise.all(items.map(send));
 }
