@@ -98,26 +98,53 @@ function sendAll(body){
   var items = body.responses.map(function(res){
     var data = {reports:[], registrations:[], deregistrations:[], updates:[], expirations:[], responses:[res]};
     var item = {id: res.requestId, data: data , mode: "once"};
-    console.log(item.id);
-    console.log(item.data);
-    console.log(item.mode);
-    console.log(routingTable[item.id]);
+    logItem(item);
     return item;
-    //return {id: res.requestId, data: data , mode: "once"};
   });
 
   items.push.apply(items, body.updates.map(function(update){
     var data = {reports:[], registrations:[], deregistrations:[], updates:[update], expirations:[], responses:[]};
     var item = {id: update.subscriptionId, data: data , mode: "subscription"};
-    console.log(item.id);
-    console.log(item.data);
-    console.log(item.mode);
-    console.log(routingTable[item.id]);
+    logItem(item);
     return item;
-    //return {id: res.requestId, data: data , mode: "once"};
   }));
 
+  items.push.apply(items, body.reports.map(function(report){
+    var data = {reports:[report], registrations:[], deregistrations:[], updates:[], expirations:[], responses:[]};
+    var item = {id: report.subscriptionId, data: data , mode: "subscription"};
+    logItem(item);
+    return item;
+  }));
+  
+  items.push.apply(items, body.registrations.map(function(reg){
+    var data = {reports:[], registrations:[reg], deregistrations:[], updates:[], expirations:[], responses:[]};
+    var item = {id: reg.subscriptionId, data: data , mode: "subscription"};
+    logItem(item);
+    return item;
+  }));
+  
+  items.push.apply(items, body.deregistrations.map(function(dereg){
+    var data = {reports:[], registrations:[dereg], deregistrations:[], updates:[], expirations:[], responses:[]};
+    var item = {id: dereg.subscriptionId, data: data , mode: "subscription"};
+    logItem(item);
+    return item;
+  }));
+
+  items.push.apply(items, body.expirations.map(function(exp){
+    var data = {reports:[], registrations:[], deregistrations:[], updates:[], expirations:[exp], responses:[]};
+    var item = {id: exp.subscriptionId, data: data , mode: "subscription"};
+    logItem(item);
+    return item;
+  }));
+  
   return Promise.all(items.map(send));
+}
+
+function logItem(item){
+  console.log(item.id);
+  console.log(item.data);
+  console.log(item.mode);
+  console.log(routingTable[item.id]);
 }
 
 function send(item){
