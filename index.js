@@ -3,7 +3,10 @@ var app = express();
 var bodyParser = require("body-parser");
 var request = require('request-promise');
 
-app.use(bodyParser.json());
+//app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
 
 // if app info is not yet registered (saved to routingTable), it will be queued
 var queue = [];
@@ -27,7 +30,9 @@ function sendDataToApp(item){
     headers: {'content-type':'application/json'},
     method: 'POST',
     json: true,
-    body: item.data,
+    resolveWithFullResponse: false,
+    //body: item.data,
+    body: item,
     timeout: 5000
   });
 }
@@ -124,7 +129,7 @@ function sendAll(body){
   }));
   
   items.push.apply(items, body.deregistrations.map(function(dereg){
-    var data = {reports:[], registrations:[dereg], deregistrations:[], updates:[], expirations:[], responses:[]};
+    var data = {reports:[], registrations:[], deregistrations:[dereg], updates:[], expirations:[], responses:[]};
     var item = {id: dereg.subscriptionId, data: data , mode: "subscription"};
     logItem(item);
     return item;
