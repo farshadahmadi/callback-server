@@ -15,6 +15,10 @@ var queue = [];
 // {"requestId":"003ccb2f-74ae-43c5-87b5-31541a209f2a","url":"http://130.230.142.100:8080/app/250330/api"}
 var routingTable = {};
 
+// maps app IDs to the subscription IDs the app has created so far. The format is  { "appId": [subscriptionId, subscriptionId, ..., subscriptionID], "appId": []}
+// for example: { "569745" : ["003ccb2f-74ae-43c5-87b5-31541a209f2a"] }
+var subscriptionsTable = {};
+
 /*app.use(function(req, res, next){
   console.log('method: ' + req.method);
   console.log('query: ' + JSON.stringify(req.query));
@@ -72,18 +76,31 @@ setInterval(processQueue, 1000);
 
 app.get('/', function (req, res) {
   console.log(JSON.stringify(queue));
+  console.log(JSON.stringify(routingTable));
+  console.log(JSON.stringify(subscriptionsTable));
   res.status(200).send(JSON.stringify(routingTable));
+});
+
+app.get('/:appId/subscriptions', function (req, res) {
+  //console.log(JSON.stringify(queue));
+  //console.log(JSON.stringify(routingTable));
+  //console.log(JSON.stringify(subscriptionsTable));
+  res.status(200).send(JSON.stringify(subscriptionsTable[req.params.appId] || []));
 });
 
 // IMPACT platform sends data to this API
 app.post('/', function (req, res) {
+  
   console.log('body: ' + JSON.stringify(req.body));
+
+  //res.status(200).send();
 
   sendAll(req.body)
     .then(function(result){
       console.log(result);
       res.status(200).send();
     });
+
   // get the requestId to find the target the application to which the data should be routed.
   /*var requestId = req.body.responses[0] ? req.body.responses[0].requestId : null;
   var subscriptionId = req.body.updates[0] ? req.body.updates[0].subscriptionId : null;
@@ -186,12 +203,21 @@ function send(item){
 // App info contains the requestId (that app got from IMPACT platfom immediately after requesting data) and the app URL. e.g.,
 // {"requestId":"003ccb2f-74ae-43c5-87b5-31541a209f2a","url":"http://130.230.142.100:8080/app/250330/api"}
 app.post('/register', function (req, res) {
+  
   console.log('body: ' + JSON.stringify(req.body));
-  //routingTable[req.body.requestId] = req.body.url;
+  
+  if(req.body.mode === "subscription"){ 
+    if(!subscriptionsTable[req.body.appId]){
+      subscriptionsTable[req.body.appId] = [];
+    }
+    subscriptionsTable[req.body.appId].push(req.body.id);
+  }
+
   routingTable[req.body.id] = req.body.url;
+
   res.status(200).send();
 });
 
-app.listen(8090, function () {
+app.listen(8082, function () {
   console.log('Example app listening on port 8080!')
 })
