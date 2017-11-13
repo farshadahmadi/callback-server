@@ -218,6 +218,6 @@ app.post('/register', function (req, res) {
   res.status(200).send();
 });
 
-app.listen(8082, function () {
-  console.log('Example app listening on port 8080!')
+app.listen(process.argv[2], function () {
+  console.log('Example app listening on port ' + process.argv[2])
 })
