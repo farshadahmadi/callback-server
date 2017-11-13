@@ -74,6 +74,28 @@ function processQueue(){
 // pops items from queue every 1 second
 setInterval(processQueue, 1000);
 
+/*app.delete('/app/:appId', function(req, res){
+  var appId = req.params.appId;
+  delete subscriptionsTable[appId];
+  res.status(202).send();
+});*/
+
+app.delete('/app/:appId/subscription/:subId', function(req, res){
+  var appId = req.params.appId;
+  var subId = req.params.subId;
+  var index = subscriptionsTable[appId] ? subscriptionsTable[appId].indexOf(subId) : -1;
+  if(index !== -1){
+    subscriptionsTable[appId].splice(index, 1);
+    if(subscriptionsTable[appId].length == 0){
+      delete subscriptionsTable[appId];
+    }
+    delete routingTable[subId];
+    res.status(202).send();
+  } else {
+    res.status(404).send();
+  }
+});
+
 app.get('/', function (req, res) {
   console.log(JSON.stringify(queue));
   console.log(JSON.stringify(routingTable));
