@@ -240,6 +240,6 @@ app.post('/register', function (req, res) {
   res.status(200).send();
 });
 
-app.listen(process.argv[2], function () {
-  console.log('Example app listening on port ' + process.argv[2])
+app.listen(process.env.PORT, function () {
+  console.log('Example app listening on port ' + process.env.PORT)
 })
