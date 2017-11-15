@@ -114,14 +114,18 @@ app.get('/:appId/subscriptions', function (req, res) {
 app.post('/', function (req, res) {
   
   console.log('body: ' + JSON.stringify(req.body));
+  console.log(Object.keys(req.body));
 
-  //res.status(200).send();
-
-  sendAll(req.body)
-    .then(function(result){
-      console.log(result);
-      res.status(200).send();
-    });
+  // This is mainly for the first time that IMPACT wants to check if the url is accessible
+  if(Object.keys(req.body).length === 0){
+    res.status(200).send();
+  } else {
+    sendAll(req.body)
+      .then(function(result){
+        console.log(result);
+        res.status(200).send();
+      });
+   }
 
   // get the requestId to find the target the application to which the data should be routed.
   /*var requestId = req.body.responses[0] ? req.body.responses[0].requestId : null;
